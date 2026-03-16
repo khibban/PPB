@@ -1,116 +1,152 @@
-Aplikasi Tebak Gambar Sederhana (Flutter)
+# Demo Flutter Row & Column
 
-Aplikasi ini merupakan aplikasi Flutter sederhana yang menampilkan sebuah gambar acak dari internet dan meminta pengguna menebak gambar tersebut. Pengguna dapat memasukkan jawaban melalui form input, kemudian jawaban tersebut akan ditampilkan di layar.
+Aplikasi Flutter sederhana yang menampilkan penggunaan **Row**, **Column**, **Container**, **AspectRatio**, dan **StatefulWidget** dengan counter.
 
-Penjelasan
+## Fitur
 
-# 1. Fungsi main()
+* Menampilkan gambar berbentuk kotak menggunakan `AspectRatio`.
+* Menampilkan teks deskriptif di bawah gambar.
+* `Row` berisi ikon dengan label: **Food**, **Scenery**, **People**.
+* Counter sederhana menggunakan `StatefulWidget` dan `setState`.
+
+## Struktur Kode dan Penjelasan
+
+### `MyApp`
+
+Merupakan widget root dari aplikasi. Di sini kita menggunakan `MaterialApp` dengan pengaturan `theme` menggunakan `ColorScheme` dari seed color `deepPurple` dan `useMaterial3: true`. Widget utama (`home`) diarahkan ke `RowColumnPage`.
+
 ```dart
-void main() {
-  runApp(const MyApp());
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const RowColumnPage(),
+    );
+  }
 }
 ```
-Fungsi ini merupakan titik awal (entry point) dari aplikasi Flutter.
 
-Fungsi runApp() digunakan untuk menjalankan widget utama yaitu MyApp.
+### `RowColumnPage`
 
-# 2. Class MyApp
-```dart
-class MyApp extends StatelessWidget
-```
-MyApp adalah widget utama dari aplikasi yang mengatur konfigurasi dasar aplikasi.
+Widget ini menggunakan `Scaffold` untuk membuat struktur halaman dengan `AppBar` dan `body`. Bagian `body` menggunakan `Column` sebagai layout utama.
 
-Fungsi utama
+#### Bagian Gambar
 
-- Menentukan tema aplikasi
-- Menentukan halaman utama aplikasi
-- Menggunakan MaterialApp sebagai dasar tampilan
-
-# 3. Class RowColumnPage
-```dart
-class RowColumnPage extends StatelessWidget
-```
-Class ini merupakan halaman utama aplikasi yang menampilkan gambar, pertanyaan, dan form input.
-
-# Struktur tampilan
-Layout utama menggunakan Column sehingga komponen disusun secara vertikal.
-
-```
-Column
- ├── Container Gambar
- ├── Container Pertanyaan
- └── FormImage (Form Jawaban)
-```
-
-# 4. Widget FormImage
+* Dibungkus `AspectRatio` dengan rasio 1:1 agar berbentuk kotak.
+* `Container` di dalamnya memiliki margin dan padding.
+* Gambar diambil dari URL menggunakan `Image.network`.
 
 ```dart
-class FormImage extends StatefulWidget
+Container(
+  child: AspectRatio(
+    aspectRatio: 1.0,
+    child: Container(
+      margin: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 10.0),
+      padding: EdgeInsets.all(20.0),
+      color: Colors.lightBlue[100],
+      child: Center(
+        child: Image.network(
+          'https://picsum.photos/200',
+          fit: BoxFit.cover,
+          width: 500,
+        ),
+      ),
+    ),
+  ),
+),
 ```
-Widget ini digunakan untuk membuat form input jawaban dari pengguna.
 
-Karena data jawaban akan berubah, maka digunakan StatefulWidget.
+#### Bagian Teks
 
-# Class _FormImageState
+* `Container` menampilkan teks deskriptif di bawah gambar.
+* Padding dan margin digunakan untuk memberi ruang agar tidak menempel pada sisi layar.
 
-Class ini menyimpan dan mengelola data dari form.
-
-## Variabel
 ```dart
-final _formKey = GlobalKey<FormState>();
-String _answer = '';
+Container(
+  width: MediaQuery.of(context).size.width,
+  margin: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 10.0),
+  padding: EdgeInsets.all(20.0),
+  color: Colors.pink[200],
+  child: Text('What image is that', style: TextStyle(fontSize: 16)),
+),
 ```
 
-| Variabel | Fungsi                          |
-| -------- | ------------------------------- |
-| _formKey | Mengontrol dan memvalidasi form |
-| _answer  | Menyimpan jawaban pengguna      |
+#### Bagian Row Ikon
 
-## Form
+* Menggunakan `Row` untuk menampilkan tiga kolom ikon dengan label.
+* `mainAxisAlignment.spaceEvenly` untuk jarak yang sama antar kolom.
+* Setiap ikon dan teks dibungkus `Column` agar vertikal.
+
 ```dart
-Form(
-  key: _formKey
-)
+Container(
+  width: MediaQuery.of(context).size.width,
+  color: Colors.yellow[200],
+  padding: EdgeInsets.all(20.0),
+  margin: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Column(children: [Icon(Icons.food_bank), Text("Food")]),
+      Column(children: [Icon(Icons.landscape), Text("Scenery")]),
+      Column(children: [Icon(Icons.people), Text("People")]),
+    ],
+  ),
+),
 ```
-Widget Form digunakan untuk mengelompokkan field input serta memudahkan proses validasi.
 
-## TextFormField
+### `CounterCard`
+
+* `StatefulWidget` untuk menampilkan counter yang bisa diubah.
+* Variabel `_counter` menyimpan nilai saat ini.
+* Fungsi `_incrementCounter` menggunakan `setState` untuk memperbarui UI saat tombol ditekan.
+
 ```dart
-TextFormField(
-  decoration: InputDecoration(label: Text("Enter your answer"))
-)
-```
-Field ini digunakan untuk memasukkan jawaban pengguna.
+class CounterCard extends StatefulWidget {
+  const CounterCard({super.key});
 
-## Validasi Input
-```dart
-validator: (value) => value!.isEmpty ? 'Please answer' : null
-```
-Field ini untuku menvalidasi input
+  @override
+  State<CounterCard> createState() => _CounterCardState();
+}
 
-## Menyimpan Jawaban
-```dart
-onSaved: (value) => setState(() {
-  _answer = value!;
-})
-```
-Ketika form disubmit:
+class _CounterCardState extends State<CounterCard> {
+  int _counter = 0;
 
-- Nilai input disimpan ke variabel _answer
-- setState() dipanggil untuk memperbarui tampilan
-
-## Tombol Submit
-```dart
-ElevatedButton(
-  onPressed: () {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      _formKey.currentState!.reset();
-    }
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
   }
-)
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+      padding: EdgeInsets.all(20.0),
+      width: MediaQuery.of(context).size.width,
+      color: Colors.cyan[100],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Counter here: $_counter", style: TextStyle(fontSize: 16)),
+          Container(
+            color: Colors.cyan[200],
+            padding: EdgeInsets.all(5.0),
+            child: IconButton(
+              onPressed: _incrementCounter,
+              icon: Icon(Icons.add, color: Colors.black, size: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 ```
-Proses ketika tombol ditekan:
-- Form akan divalidasi
-- Jika valid, jawaban akan disimpan
-- Field input akan dikosongkan kembali
